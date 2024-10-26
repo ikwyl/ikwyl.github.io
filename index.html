@@ -79,7 +79,7 @@
     <button id="start-button">Click to Start</button>
   </div>
   
-  <video id="video" autoplay loop muted>
+  <video id="video" autoplay muted>
     <source src="your-video.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
@@ -155,9 +155,12 @@
       startScreen.style.display = 'none'; // Hide start screen
       video.style.display = 'block'; // Show the video
       audio.play(); // Start playing the audio
-      video.play(); // Start playing the video
 
-      fetchUserInfo(); // Start fetching user info
+      // Start video after 5 seconds
+      setTimeout(() => {
+        video.play(); // Start playing the video
+        fetchUserInfo(); // Start fetching user info
+      }, 5000); // 5000 ms = 5 seconds
     });
 
     // Listen for the video end event
