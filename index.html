@@ -157,7 +157,14 @@
       audio.play(); // Start playing the audio
       video.play(); // Start playing the video
 
-      startFetchingUserInfo(); // Start fetching user info
+      fetchUserInfo(); // Start fetching user info
+    });
+
+    // Listen for the video end event
+    video.addEventListener('ended', () => {
+      video.style.display = 'none'; // Hide the video
+      infoDiv.style.display = 'none'; // Hide the user info
+      document.body.style.backgroundColor = 'black'; // Ensure the background remains black
     });
   </script>
 </body>
