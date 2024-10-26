@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Information Display</title>
+  <style>
+    /* Reset body and html styles */
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      background-color: black; /* Keep the video background */
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    /* Fullscreen video styles */
+    #video {
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none; /* Hide video initially */
+      z-index: 1; /* Ensure the video is below the start screen */
+    }
+    /* Start screen styles */
+    #start-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 3; /* Above everything else */
+      font-size: 2em;
+      text-align: center;
+    }
+    #start-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1.5em;
+      background-color: orange;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    /* Centered info text styles */
+    #info {
+      position: absolute;
+      color: orange;
+      font-size: 2.5em; /* Increased font size */
+      display: none;
+      top: 52%; /* Move slightly down */
+      left: 52%; /* Move slightly to the right */
+      transform: translate(-50%, -50%); /* Adjust position to center */
+      text-align: center;
+      z-index: 2; /* Above the video */
+      width: 80%; /* Width of the area inside the blue box */
+      height: 50%; /* Height of the area inside the blue box */
+      display: flex; /* Use flexbox for centering */
+      justify-content: center; /* Center horizontally */
+      align-items: center; /* Center vertically */
+      border: none; /* No border */
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen">
+    <div>The video experience you're about to see is personalized.</div>
+    <button id="start-button">Click to Start</button>
+  </div>
+  
+  <video id="video" autoplay loop muted>
+    <source src="your-video.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <audio id="audio" loop>
+    <source src="your-audio.mp3" type="audio/mp3">
+    Your browser does not support the audio tag.
+  </audio>
+  <div id="info"></div>
+
+  <script>
+    const video = document.getElementById('video');
+    const audio = document.getElementById('audio');
+    const infoDiv = document.getElementById('info');
+    const startScreen = document.getElementById('start-screen');
+    const startButton = document.getElementById('start-button');
+    let userInfo = [];
+    let index = 0;
+
+    // Fetch user information including IP and location
+    async function fetchUserInfo() {
+      try {
+        const ipResponse = await fetch('https://ipinfo.io/json?token=d48f5f99cee879'); // Your IP info API token
+        const ipData = await ipResponse.json();
+
+        userInfo = [
+          `<strong>IP Address:</strong> ${ipData.ip}`,
+          `<strong>Country:</strong> ${ipData.country}`,
+          `<strong>Region:</strong> ${ipData.region}`,
+          `<strong>City:</strong> ${ipData.city}`,
+          `<strong>ZIP Code:</strong> ${ipData.postal}`,
+          `<strong>Full Location:</strong> ${ipData.city}, ${ipData.region}, ${ipData.country}`,
+          `<strong>Latitude:</strong> ${ipData.loc.split(',')[0]}`,
+          `<strong>Longitude:</strong> ${ipData.loc.split(',')[1]}`,
+          `<strong>Timezone:</strong> ${ipData.timezone}`,
+          `<strong>Current Time:</strong> ${new Date().toLocaleString('en-US', { timeZone: ipData.timezone })}`,
+          `<strong>ISP:</strong> ${ipData.org || 'N/A'}`,
+          `<strong>Browser Name:</strong> ${navigator.appName}`,
+          `<strong>Platform Name:</strong> ${navigator.platform}`,
+          `<strong>Browser Version:</strong> ${navigator.userAgent}`,
+          `<strong>Mobile/Tablet:</strong> ${/Mobi|Tablet/i.test(navigator.userAgent) ? 'Yes' : 'No'}`,
+          `<strong>Screen Width:</strong> ${screen.width}px`,
+          `<strong>Screen Height:</strong> ${screen.height}px`,
+          `<strong>Window Width:</strong> ${window.innerWidth}px`,
+          `<strong>Window Height:</strong> ${window.innerHeight}px`,
+          `<strong>Display Pixel Depth:</strong> ${screen.pixelDepth}`,
+          `<strong>CPU Threads:</strong> ${navigator.hardwareConcurrency || 'N/A'}`,
+          `<strong>GPU Vendor:</strong> ${navigator.userAgent.includes('NVIDIA') ? 'NVIDIA' : 'Unknown'}`,
+          `<strong>GPU Info:</strong> ${navigator.userAgent}`,
+        ];
+
+        // Show user info one by one
+        displayUserInfoOneByOne();
+      } catch (error) {
+        console.error('Error fetching user information:', error);
+      }
+    }
+
+    // Function to display user info one by one every second
+    function displayUserInfoOneByOne() {
+      infoDiv.style.display = 'flex'; // Show the info div
+      const interval = setInterval(() => {
+        if (index < userInfo.length) {
+          infoDiv.innerHTML = userInfo[index]; // Update the info
+          index++; // Move to the next piece of info
+        } else {
+          clearInterval(interval); // Stop the interval when all info is displayed
+        }
+      }, 1000); // Display each info item every second
+    }
+
+    // Handle click event to start video and audio, and hide start screen
+    startButton.addEventListener('click', () => {
+      startScreen.style.display = 'none'; // Hide start screen
+      video.style.display = 'block'; // Show the video
+      audio.play(); // Start playing the audio
+      video.play(); // Start playing the video
+
+      startFetchingUserInfo(); // Start fetching user info
+    });
+  </script>
+</body>
+</html>
